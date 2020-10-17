@@ -8,6 +8,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
+use League\OAuth2\Client\Provider\FacebookUser;
 use League\OAuth2\Client\Provider\GithubResourceOwner;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -72,11 +73,9 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
         /** @var Users|null $user */
         $user = $this->createQueryBuilder('u')
             ->where('u.githubId = :githubId')
-            ->orWhere('u.username = :username')
             ->orWhere('u.email = :email')
             ->setParameters([
                 'githubId' => $githubResourceOwner->getId(),
-                'username' => $githubResourceOwner->getNickname(),
                 'email' => $githubResourceOwner->getEmail()
             ])
             ->getQuery()
@@ -93,7 +92,7 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
 
         $user = (new Users())
             ->setGithubId($githubResourceOwner->getId())
-            ->setUsername($githubResourceOwner->getNickname())
+            ->setUsername($githubResourceOwner->getEmail())
             ->setEmail($githubResourceOwner->getEmail())
         ;
 
@@ -103,4 +102,47 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
 
         return $user;
     }
+
+    /**
+     * @param FacebookUser $facebookUser
+     * @return Users
+     * @throws NonUniqueResultException
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function findOrCreateFromFacebookOauthToken(FacebookUser $facebookUser): Users
+    {
+        /** @var Users|null $user */
+        $user = $this->createQueryBuilder('u')
+            ->where('u.facebookId = :facebookId')
+            ->orWhere('u.email = :email')
+            ->setParameters([
+                'facebookId' => $facebookUser->getId(),
+                'email' => $facebookUser->getEmail(),
+            ])
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+
+        if ($user) {
+            if ($user->getFacebookId() === null) {
+                $user->setFacebookId($facebookUser->getId());
+                $this->getEntityManager()->flush();
+            }
+            return $user;
+        }
+
+        $user = (new Users())
+            ->setFacebookId($facebookUser->getId())
+            ->setUsername($facebookUser->getEmail())
+            ->setEmail($facebookUser->getEmail())
+        ;
+
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return $user;
+    }
+
 }

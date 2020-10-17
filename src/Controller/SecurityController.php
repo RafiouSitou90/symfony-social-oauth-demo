@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\Provider\GithubClient;
+use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,7 +35,7 @@ class SecurityController extends AbstractController
      * @param ClientRegistry $clientRegistry
      * @return RedirectResponse
      */
-    public function connect(ClientRegistry $clientRegistry): RedirectResponse
+    public function github_connect(ClientRegistry $clientRegistry): RedirectResponse
     {
         /** @var GithubClient $client */
         $client = $clientRegistry->getClient('github');
@@ -42,10 +43,23 @@ class SecurityController extends AbstractController
     }
 
     /**
+     * @Route("/connect/facebook", name="app_facebook_connect")
+     * @param ClientRegistry $clientRegistry
+     * @return RedirectResponse
+     */
+    public function facebook_connect(ClientRegistry $clientRegistry): RedirectResponse
+    {
+        /** @var GithubClient $client */
+        $client = $clientRegistry->getClient('facebook');
+
+        return $client->redirect(['email']);
+    }
+
+    /**
      * @Route("/logout", name="app_logout")
      */
     public function logout()
     {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        throw new LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 }

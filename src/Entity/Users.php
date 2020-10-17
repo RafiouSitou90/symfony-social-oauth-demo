@@ -44,6 +44,11 @@ class Users implements UserInterface
      */
     private ?string $githubId = null;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private ?string $facebookId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,6 +142,18 @@ class Users implements UserInterface
     public function setGithubId(?string $githubId): self
     {
         $this->githubId = $githubId;
+
+        return $this;
+    }
+
+    public function getFacebookId(): ?string
+    {
+        return $this->facebookId;
+    }
+
+    public function setFacebookId(?string $facebookId): self
+    {
+        $this->facebookId = $facebookId;
 
         return $this;
     }
