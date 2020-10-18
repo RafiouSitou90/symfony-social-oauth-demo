@@ -9,66 +9,66 @@ use App\Security\Exception\NotVerifiedEmailException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
-use League\OAuth2\Client\Provider\GoogleUser;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use RuntimeException;
+use Wohali\OAuth2\Client\Provider\DiscordResourceOwner;
 
 /**
- * Class GoogleAuthenticator
+ * Class DiscordAuthenticator
  * @package App\Security
  */
-class GoogleAuthenticator extends AbstractSocialAuthenticator
+class DiscordAuthenticator extends AbstractSocialAuthenticator
 {
-    protected string $serviceName = 'google';
+    protected string $serviceName = 'discord';
 
     /**
-     * @param ResourceOwnerInterface $googleUser
+     * @param ResourceOwnerInterface $discordUser
      * @param UsersRepository $usersRepository
      * @return Users|null
      * @throws NonUniqueResultException
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function getUserFromResourceOwner(
-        ResourceOwnerInterface $googleUser,
+    protected function getUserFromResourceOwner(
+        ResourceOwnerInterface $discordUser,
         UsersRepository $usersRepository
     ): ?Users
     {
-        if (!($googleUser instanceof GoogleUser)) {
-            throw new RuntimeException('Expecting GoogleUser as the first parameter');
+        if (!($discordUser instanceof DiscordResourceOwner)) {
+            throw new RuntimeException('Expecting DiscordResourceOwner as the first parameter');
         }
-        if (true !== ($googleUser->toArray()['email_verified'] ?? null)) {
+        if (true !== ($discordUser->toArray()['verified'] ?? null)) {
             throw new NotVerifiedEmailException();
         }
 
         $user = $usersRepository->findForOauth(
-            'google',
-            $googleUser->getId(),
-            $googleUser->getEmail())
+            $this->serviceName,
+            $discordUser->getId(),
+            $discordUser->getEmail())
         ;
 
         if ($user) {
-            if (strtolower($googleUser->getEmail()) === $user->getEmail()
-                && $user->getGoogleId() !== (string) $googleUser->getId()
+            if (strtolower($discordUser->getEmail()) === $user->getEmail()
+                && $user->getDiscordId() !== (string) $discordUser->getId()
             ) {
                 throw new EmailAlreadyUsedException();
             }
 
-            if (null === $user->getGoogleId()) {
-                $user->setGoogleId($googleUser->getId());
+            if (null === $user->getDiscordId()) {
+                $user->setDiscordId($discordUser->getId());
                 $this->entityManager->flush();
 
                 return $user;
-            } else if ($user->getGoogleId() === (string) $googleUser->getId()) {
+            } else if ($user->getDiscordId() === (string) $discordUser->getId()) {
 
                 return $user;
             }
         }
 
         $user = $usersRepository->createForOauth(
-            'google',
-            $googleUser->getId(),
-            $googleUser->getEmail()
+            $this->serviceName,
+            $discordUser->getId(),
+            $discordUser->getEmail()
         );
 
         return $user;

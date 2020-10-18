@@ -54,6 +54,11 @@ class Users implements UserInterface
      */
     private $googleId;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $discordId;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -171,6 +176,18 @@ class Users implements UserInterface
     public function setGoogleId(?string $googleId): self
     {
         $this->googleId = $googleId;
+
+        return $this;
+    }
+
+    public function getDiscordId(): ?string
+    {
+        return $this->discordId;
+    }
+
+    public function setDiscordId(?string $discordId): self
+    {
+        $this->discordId = $discordId;
 
         return $this;
     }

@@ -3,7 +3,10 @@
 namespace App\Controller;
 
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
+use KnpU\OAuth2ClientBundle\Client\Provider\DiscordClient;
+use KnpU\OAuth2ClientBundle\Client\Provider\FacebookClient;
 use KnpU\OAuth2ClientBundle\Client\Provider\GithubClient;
+use KnpU\OAuth2ClientBundle\Client\Provider\GoogleClient;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -15,6 +18,8 @@ class SecurityController extends AbstractController
 {
     /**
      * @Route("/login", name="app_login")
+     * @param AuthenticationUtils $authenticationUtils
+     * @return Response
      */
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -49,7 +54,7 @@ class SecurityController extends AbstractController
      */
     public function facebook_connect(ClientRegistry $clientRegistry): RedirectResponse
     {
-        /** @var GithubClient $client */
+        /** @var FacebookClient $client */
         $client = $clientRegistry->getClient('facebook');
 
         return $client->redirect(['email']);
@@ -62,10 +67,23 @@ class SecurityController extends AbstractController
      */
     public function google_connect(ClientRegistry $clientRegistry): RedirectResponse
     {
-        /** @var GithubClient $client */
+        /** @var GoogleClient $client */
         $client = $clientRegistry->getClient('google');
 
         return $client->redirect(['profile', 'email']);
+    }
+
+    /**
+     * @Route("/connect/discord", name="app_discord_connect")
+     * @param ClientRegistry $clientRegistry
+     * @return RedirectResponse
+     */
+    public function discord_connect(ClientRegistry $clientRegistry): RedirectResponse
+    {
+        /** @var DiscordClient $client */
+        $client = $clientRegistry->getClient('discord');
+
+        return $client->redirect(['identify', 'email']);
     }
 
     /**
