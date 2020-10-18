@@ -42,7 +42,7 @@ class GoogleAuthenticator extends AbstractSocialAuthenticator
         }
 
         $user = $usersRepository->findForOauth(
-            'google',
+            $this->serviceName,
             $googleUser->getId(),
             $googleUser->getEmail())
         ;
@@ -66,7 +66,7 @@ class GoogleAuthenticator extends AbstractSocialAuthenticator
         }
 
         $user = $usersRepository->createForOauth(
-            'google',
+            $this->serviceName,
             $googleUser->getId(),
             $googleUser->getEmail()
         );

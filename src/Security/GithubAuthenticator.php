@@ -46,7 +46,7 @@ class GithubAuthenticator extends AbstractSocialAuthenticator
         }
 
         $user = $usersRepository->findForOauth(
-            'github',
+            $this->serviceName,
             $githubUser->getId(),
             $githubUser->getEmail())
         ;
@@ -70,7 +70,7 @@ class GithubAuthenticator extends AbstractSocialAuthenticator
         }
 
         $user = $usersRepository->createForOauth(
-            'github',
+            $this->serviceName,
             $githubUser->getId(),
             $githubUser->getEmail()
         );

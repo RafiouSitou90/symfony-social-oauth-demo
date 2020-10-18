@@ -38,7 +38,7 @@ class FacebookAuthenticator extends AbstractSocialAuthenticator
         }
 
         $user = $usersRepository->findForOauth(
-            'facebook',
+            $this->serviceName,
             $facebookUser->getId(),
             $facebookUser->getEmail())
         ;
@@ -62,7 +62,7 @@ class FacebookAuthenticator extends AbstractSocialAuthenticator
         }
 
         $user = $usersRepository->createForOauth(
-            'facebook',
+            $this->serviceName,
             $facebookUser->getId(),
             $facebookUser->getEmail()
         );
