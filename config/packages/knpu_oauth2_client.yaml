@@ -16,3 +16,19 @@ knpu_oauth2_client:
             redirect_params:
                 service: facebook
             graph_api_version: v8.0
+
+        google:
+            type: google
+            client_id: '%env(OAUTH_GOOGLE_ID)%'
+            client_secret: '%env(OAUTH_GOOGLE_SECRET)%'
+            redirect_route: oauth_check
+            redirect_params:
+                service: google
+
+        discord:
+            type: discord
+            client_id: '%env(OAUTH_DISCORD_ID)%'
+            client_secret: '%env(OAUTH_DISCORD_SECRET)%'
+            redirect_route: oauth_check
+            redirect_params:
+                service: discord

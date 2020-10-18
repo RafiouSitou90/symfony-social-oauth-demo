@@ -6,20 +6,20 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 use Throwable;
 
 /**
- * Class NotVerifiedEmailException
+ * Class EmailAlreadyUsedException
  * @package App\Security\Exception
  */
-class NotVerifiedEmailException extends CustomUserMessageAuthenticationException
+class EmailAlreadyUsedException extends CustomUserMessageAuthenticationException
 {
     /**
-     * NotVerifiedEmailException constructor.
+     * EmailAlreadyUsedException constructor.
      * @param string $message
      * @param array $messageData
      * @param int $code
      * @param Throwable|null $previous
      */
     public function __construct(
-        string $message = 'This account does not appear to have a verified email',
+        string $message = 'An account already exists with this email.',
         array $messageData = [],
         int $code = 0,
         Throwable $previous = null

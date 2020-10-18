@@ -4,6 +4,7 @@ namespace App\Security;
 
 use App\Entity\Users;
 use App\Repository\UsersRepository;
+use App\Security\Exception\EmailAlreadyUsedException;
 use App\Security\Exception\NotVerifiedEmailException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\OptimisticLockException;
@@ -18,6 +19,10 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
+/**
+ * Class GithubAuthenticator
+ * @package App\Security
+ */
 class GithubAuthenticator extends AbstractSocialAuthenticator
 {
 
@@ -41,20 +46,31 @@ class GithubAuthenticator extends AbstractSocialAuthenticator
         }
 
         $user = $usersRepository->findForOauth(
-            'github',
+            $this->serviceName,
             $githubUser->getId(),
             $githubUser->getEmail())
         ;
 
-        if ($user && null === $user->getGithubId()) {
-            $user->setGithubId($githubUser->getId());
-            $this->entityManager->flush();
+        if ($user) {
+            if (strtolower($githubUser->getEmail()) === $user->getEmail()
+                && $user->getGithubId() !== (string) $githubUser->getId()
+            ) {
+                throw new EmailAlreadyUsedException();
+            }
 
-            return $user;
+            if (null === $user->getGithubId()) {
+                $user->setGithubId($githubUser->getId());
+                $this->entityManager->flush();
+
+                return $user;
+            } else if ($user->getGithubId() === (string) $githubUser->getId()) {
+
+                return $user;
+            }
         }
 
         $user = $usersRepository->createForOauth(
-            'github',
+            $this->serviceName,
             $githubUser->getId(),
             $githubUser->getEmail()
         );
