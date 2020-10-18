@@ -4,6 +4,7 @@ namespace App\Security;
 
 use App\Entity\Users;
 use App\Repository\UsersRepository;
+use App\Security\Exception\UserOauthNotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
@@ -22,6 +23,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
+/**
+ * Class AbstractSocialAuthenticator
+ * @package App\Security
+ */
 class AbstractSocialAuthenticator extends SocialAuthenticator
 {
 
@@ -101,7 +106,7 @@ class AbstractSocialAuthenticator extends SocialAuthenticator
     }
 
     /**
-     * @param mixed $credentials
+     * @param AccessToken $credentials
      * @param UserProviderInterface $userProvider
      * @return Users|UserInterface|null
      */
@@ -112,7 +117,7 @@ class AbstractSocialAuthenticator extends SocialAuthenticator
 
         $user = $this->getUserFromResourceOwner($resourceOwner, $usersRepository);
         if (null === $user) {
-            dd($user);
+            throw new UserOauthNotFoundException($resourceOwner);
         }
 
         return $user;
