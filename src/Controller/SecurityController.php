@@ -56,6 +56,19 @@ class SecurityController extends AbstractController
     }
 
     /**
+     * @Route("/connect/google", name="app_google_connect")
+     * @param ClientRegistry $clientRegistry
+     * @return RedirectResponse
+     */
+    public function google_connect(ClientRegistry $clientRegistry): RedirectResponse
+    {
+        /** @var GithubClient $client */
+        $client = $clientRegistry->getClient('google');
+
+        return $client->redirect(['profile', 'email']);
+    }
+
+    /**
      * @Route("/logout", name="app_logout")
      */
     public function logout()

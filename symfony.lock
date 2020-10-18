@@ -123,6 +123,9 @@
     "league/oauth2-github": {
         "version": "2.0.0"
     },
+    "league/oauth2-google": {
+        "version": "3.0.3"
+    },
     "monolog/monolog": {
         "version": "2.1.1"
     },
