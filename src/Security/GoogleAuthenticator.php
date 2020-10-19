@@ -32,8 +32,7 @@ class GoogleAuthenticator extends AbstractSocialAuthenticator
     public function getUserFromResourceOwner(
         ResourceOwnerInterface $googleUser,
         UsersRepository $usersRepository
-    ): ?Users
-    {
+    ): ?Users {
         if (!($googleUser instanceof GoogleUser)) {
             throw new RuntimeException('Expecting GoogleUser as the first parameter');
         }
@@ -44,11 +43,11 @@ class GoogleAuthenticator extends AbstractSocialAuthenticator
         $user = $usersRepository->findForOauth(
             $this->serviceName,
             $googleUser->getId(),
-            $googleUser->getEmail())
-        ;
+            $googleUser->getEmail()
+        );
 
         if ($user) {
-            if (strtolower($googleUser->getEmail()) === $user->getEmail()
+            if (strtolower((string) $googleUser->getEmail()) === $user->getEmail()
                 && $user->getGoogleId() !== (string) $googleUser->getId()
             ) {
                 throw new EmailAlreadyUsedException();
@@ -59,8 +58,7 @@ class GoogleAuthenticator extends AbstractSocialAuthenticator
                 $this->entityManager->flush();
 
                 return $user;
-            } else if ($user->getGoogleId() === (string) $googleUser->getId()) {
-
+            } elseif ($user->getGoogleId() === (string) $googleUser->getId()) {
                 return $user;
             }
         }

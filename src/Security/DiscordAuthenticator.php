@@ -32,8 +32,7 @@ class DiscordAuthenticator extends AbstractSocialAuthenticator
     protected function getUserFromResourceOwner(
         ResourceOwnerInterface $discordUser,
         UsersRepository $usersRepository
-    ): ?Users
-    {
+    ): ?Users {
         if (!($discordUser instanceof DiscordResourceOwner)) {
             throw new RuntimeException('Expecting DiscordResourceOwner as the first parameter');
         }
@@ -44,11 +43,11 @@ class DiscordAuthenticator extends AbstractSocialAuthenticator
         $user = $usersRepository->findForOauth(
             $this->serviceName,
             $discordUser->getId(),
-            $discordUser->getEmail())
-        ;
+            $discordUser->getEmail()
+        );
 
         if ($user) {
-            if (strtolower($discordUser->getEmail()) === $user->getEmail()
+            if (strtolower((string) $discordUser->getEmail()) === $user->getEmail()
                 && $user->getDiscordId() !== (string) $discordUser->getId()
             ) {
                 throw new EmailAlreadyUsedException();
@@ -59,8 +58,7 @@ class DiscordAuthenticator extends AbstractSocialAuthenticator
                 $this->entityManager->flush();
 
                 return $user;
-            } else if ($user->getDiscordId() === (string) $discordUser->getId()) {
-
+            } elseif ($user->getDiscordId() === (string) $discordUser->getId()) {
                 return $user;
             }
         }

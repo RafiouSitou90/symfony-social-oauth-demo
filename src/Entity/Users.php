@@ -51,14 +51,19 @@ class Users implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
      */
-    private $googleId;
+    private ?string $googleId = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
      */
-    private $discordId;
+    private ?string $discordId = null;
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
@@ -74,6 +79,10 @@ class Users implements UserInterface
         return (string) $this->username;
     }
 
+    /**
+     * @param string $username
+     * @return $this
+     */
     public function setUsername(string $username): self
     {
         $this->username = $username;
@@ -93,6 +102,10 @@ class Users implements UserInterface
         return array_unique($roles);
     }
 
+    /**
+     * @param array $roles
+     * @return $this
+     */
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
@@ -108,6 +121,10 @@ class Users implements UserInterface
         return (string) $this->password;
     }
 
+    /**
+     * @param string $password
+     * @return $this
+     */
     public function setPassword(string $password): self
     {
         $this->password = $password;
@@ -117,14 +134,17 @@ class Users implements UserInterface
 
     /**
      * @see UserInterface
+     * @return null
      */
     public function getSalt()
     {
         // not needed when using the "bcrypt" algorithm in security.yaml
+        return null;
     }
 
     /**
      * @see UserInterface
+     * @return void
      */
     public function eraseCredentials()
     {
@@ -132,11 +152,18 @@ class Users implements UserInterface
         // $this->plainPassword = null;
     }
 
+    /**
+     * @return string|null
+     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
+    /**
+     * @param string|null $email
+     * @return $this
+     */
     public function setEmail(?string $email): self
     {
         $this->email = $email;
@@ -144,11 +171,18 @@ class Users implements UserInterface
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getGithubId(): ?string
     {
         return $this->githubId;
     }
 
+    /**
+     * @param string|null $githubId
+     * @return $this
+     */
     public function setGithubId(?string $githubId): self
     {
         $this->githubId = $githubId;
@@ -156,11 +190,18 @@ class Users implements UserInterface
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getFacebookId(): ?string
     {
         return $this->facebookId;
     }
 
+    /**
+     * @param string|null $facebookId
+     * @return $this
+     */
     public function setFacebookId(?string $facebookId): self
     {
         $this->facebookId = $facebookId;
@@ -168,11 +209,18 @@ class Users implements UserInterface
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getGoogleId(): ?string
     {
         return $this->googleId;
     }
 
+    /**
+     * @param string|null $googleId
+     * @return $this
+     */
     public function setGoogleId(?string $googleId): self
     {
         $this->googleId = $googleId;
@@ -180,11 +228,18 @@ class Users implements UserInterface
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getDiscordId(): ?string
     {
         return $this->discordId;
     }
 
+    /**
+     * @param string|null $discordId
+     * @return $this
+     */
     public function setDiscordId(?string $discordId): self
     {
         $this->discordId = $discordId;

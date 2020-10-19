@@ -25,7 +25,6 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  */
 class GithubAuthenticator extends AbstractSocialAuthenticator
 {
-
     protected string $serviceName = 'github';
 
     /**
@@ -39,8 +38,7 @@ class GithubAuthenticator extends AbstractSocialAuthenticator
     protected function getUserFromResourceOwner(
         ResourceOwnerInterface $githubUser,
         UsersRepository $usersRepository
-    ): ?Users
-    {
+    ): ?Users {
         if (!($githubUser instanceof GithubResourceOwner)) {
             throw new RuntimeException('Expecting GithubResourceOwner as the first parameter');
         }
@@ -48,11 +46,11 @@ class GithubAuthenticator extends AbstractSocialAuthenticator
         $user = $usersRepository->findForOauth(
             $this->serviceName,
             $githubUser->getId(),
-            $githubUser->getEmail())
-        ;
+            $githubUser->getEmail()
+        );
 
         if ($user) {
-            if (strtolower($githubUser->getEmail()) === $user->getEmail()
+            if (strtolower((string) $githubUser->getEmail()) === $user->getEmail()
                 && $user->getGithubId() !== (string) $githubUser->getId()
             ) {
                 throw new EmailAlreadyUsedException();
@@ -63,8 +61,7 @@ class GithubAuthenticator extends AbstractSocialAuthenticator
                 $this->entityManager->flush();
 
                 return $user;
-            } else if ($user->getGithubId() === (string) $githubUser->getId()) {
-
+            } elseif ($user->getGithubId() === (string) $githubUser->getId()) {
                 return $user;
             }
         }

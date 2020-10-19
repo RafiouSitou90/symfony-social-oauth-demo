@@ -29,7 +29,6 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  */
 class AbstractSocialAuthenticator extends SocialAuthenticator
 {
-
     use TargetPathTrait;
 
     /**
@@ -51,22 +50,28 @@ class AbstractSocialAuthenticator extends SocialAuthenticator
      * @var EntityManagerInterface
      */
     protected EntityManagerInterface $entityManager;
+    /**
+     * @var UsersRepository
+     */
+    private UsersRepository $usersRepository;
 
     /**
      * AbstractSocialAuthenticator constructor.
      * @param RouterInterface $router
      * @param ClientRegistry $clientRegistry
      * @param EntityManagerInterface $entityManager
+     * @param UsersRepository $usersRepository
      */
     public function __construct(
         RouterInterface $router,
         ClientRegistry $clientRegistry,
-        EntityManagerInterface $entityManager
-    )
-    {
+        EntityManagerInterface $entityManager,
+        UsersRepository $usersRepository
+    ) {
         $this->router = $router;
         $this->clientRegistry = $clientRegistry;
         $this->entityManager = $entityManager;
+        $this->usersRepository = $usersRepository;
     }
 
     /**
@@ -113,9 +118,8 @@ class AbstractSocialAuthenticator extends SocialAuthenticator
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         $resourceOwner = $this->getResourceOwnerFromCredentials($credentials);
-        $usersRepository = $this->entityManager->getRepository(Users::class);
 
-        $user = $this->getUserFromResourceOwner($resourceOwner, $usersRepository);
+        $user = $this->getUserFromResourceOwner($resourceOwner, $this->usersRepository);
         if (null === $user) {
             throw new UserOauthNotFoundException($resourceOwner);
         }
@@ -169,8 +173,7 @@ class AbstractSocialAuthenticator extends SocialAuthenticator
     protected function getUserFromResourceOwner(
         ResourceOwnerInterface $resourceOwner,
         UsersRepository $usersRepository
-    ): ?Users
-    {
+    ): ?Users {
         return null;
     }
 
