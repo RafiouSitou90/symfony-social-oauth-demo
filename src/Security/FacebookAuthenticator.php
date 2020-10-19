@@ -31,8 +31,7 @@ class FacebookAuthenticator extends AbstractSocialAuthenticator
     protected function getUserFromResourceOwner(
         ResourceOwnerInterface $facebookUser,
         UsersRepository $usersRepository
-    ): ?Users
-    {
+    ): ?Users {
         if (!($facebookUser instanceof FacebookUser)) {
             throw new RuntimeException('Expecting FacebookClient as the first parameter');
         }
@@ -40,11 +39,11 @@ class FacebookAuthenticator extends AbstractSocialAuthenticator
         $user = $usersRepository->findForOauth(
             $this->serviceName,
             $facebookUser->getId(),
-            $facebookUser->getEmail())
-        ;
+            $facebookUser->getEmail()
+        );
 
         if ($user) {
-            if (strtolower($facebookUser->getEmail()) === $user->getEmail()
+            if (strtolower((string) $facebookUser->getEmail()) === $user->getEmail()
                 && $user->getFacebookId() !== (string) $facebookUser->getId()
             ) {
                 throw new EmailAlreadyUsedException();
@@ -55,8 +54,7 @@ class FacebookAuthenticator extends AbstractSocialAuthenticator
                 $this->entityManager->flush();
 
                 return $user;
-            } else if ($user->getFacebookId() === (string) $facebookUser->getId()) {
-
+            } elseif ($user->getFacebookId() === (string) $facebookUser->getId()) {
                 return $user;
             }
         }

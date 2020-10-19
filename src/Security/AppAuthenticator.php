@@ -2,8 +2,9 @@
 
 namespace App\Security;
 
-use App\Entity\Users;
+use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,6 +36,10 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator implements Passwor
     private UrlGeneratorInterface $urlGenerator;
     private CsrfTokenManagerInterface $csrfTokenManager;
     private UserPasswordEncoderInterface $passwordEncoder;
+    /**
+     * @var UsersRepository
+     */
+    private UsersRepository $usersRepository;
 
     /**
      * AppAuthenticator constructor.
@@ -42,13 +47,20 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator implements Passwor
      * @param UrlGeneratorInterface $urlGenerator
      * @param CsrfTokenManagerInterface $csrfTokenManager
      * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param UsersRepository $usersRepository
      */
-    public function __construct(EntityManagerInterface $entityManager, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, UserPasswordEncoderInterface $passwordEncoder)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        UrlGeneratorInterface $urlGenerator,
+        CsrfTokenManagerInterface $csrfTokenManager,
+        UserPasswordEncoderInterface $passwordEncoder,
+        UsersRepository $usersRepository
+    ) {
         $this->entityManager = $entityManager;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
         $this->passwordEncoder = $passwordEncoder;
+        $this->usersRepository = $usersRepository;
     }
 
     /**
@@ -84,6 +96,7 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator implements Passwor
      * @param mixed $credentials
      * @param UserProviderInterface $userProvider
      * @return UserInterface|null
+     * @throws NonUniqueResultException
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
@@ -92,7 +105,7 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator implements Passwor
             throw new InvalidCsrfTokenException();
         }
 
-        $user = $this->entityManager->getRepository(Users::class)->findOneByUsernameOrEmail($credentials['username']);
+        $user = $this->usersRepository->findOneByUsernameOrEmail($credentials['username']);
 
         if (!$user) {
             // fail authentication with a custom error

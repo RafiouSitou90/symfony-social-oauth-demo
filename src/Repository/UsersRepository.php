@@ -32,6 +32,7 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
      * @param string $newEncodedPassword
      * @throws ORMException
      * @throws OptimisticLockException
+     * @return void
      */
     public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
     {
@@ -162,7 +163,7 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
             ->setMaxResults(1)
             ->setParameters([
                 'serviceId' => $serviceId,
-                'email' => strtolower($email),
+                'email' => strtolower((string) $email),
             ])
             ->getQuery()
             ->getOneOrNullResult()
@@ -171,23 +172,22 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
 
     /**
      * @param string $serviceName
-     * @param string $serviceId
-     * @param string $email
+     * @param string|null $serviceId
+     * @param string|null $email
      * @return Users
      * @throws ORMException
      * @throws OptimisticLockException
      */
     public function createForOauth(
         string $serviceName,
-        string $serviceId,
-        string $email
-    ): Users
-    {
+        ?string $serviceId,
+        ?string $email
+    ): Users {
         $serviceIdSetter = 'set' . ucfirst($serviceName) . 'Id';
         $user = (new Users())
             ->$serviceIdSetter($serviceId)
-            ->setUsername(strtolower($email))
-            ->setEmail(strtolower($email))
+            ->setUsername(strtolower((string) $email))
+            ->setEmail(strtolower((string) $email))
         ;
 
         $entityManager = $this->getEntityManager();
